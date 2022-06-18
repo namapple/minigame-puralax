@@ -23,13 +23,9 @@ public class MainMenuManager : MonoBehaviour
         stagePanel.SetActive(false);
     }
 
-    private void OnEnable()
-    {
-        AudioManager.instance.AddButtonSound();
-    }
-
     private void Start()
     {
+        AudioManager.instance.AddButtonSound();
         btnPlay.onClick.AddListener(OnClickBtnPlay);
         btnQuit.onClick.AddListener(OnClickBtnQuit);
         btnBackToMain.onClick.AddListener(OnClickBtnBackToMain);

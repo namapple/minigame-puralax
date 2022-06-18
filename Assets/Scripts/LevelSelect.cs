@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -20,6 +21,11 @@ public class LevelSelect : MonoBehaviour
         TMP_Text countText = GetComponentInChildren<TMP_Text>();
         countText.text = currentLevel.ToString();
         buttonImage = GetComponent<Image>();
+    }
+
+    private void Start()
+    {
+        button.onClick.AddListener(UpdateLevel);
     }
 
     private void OnEnable()
