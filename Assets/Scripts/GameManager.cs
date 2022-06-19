@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour
         int currentStage = PlayerPrefs.GetInt(DATA.CURRENT_STAGE);
         string currentStageName = DATA.CURRENT_STAGE + "_" + currentStage;
         int currentLevel = PlayerPrefs.GetInt(DATA.CURRENT_LEVEL);
-        string currentLevelName = currentStageName + "_" + currentLevel;
+        currentLevelName = currentStageName + "_" + currentLevel;
 
         currentLevelObject = levelDictionary.GetLevel(currentLevelName);
         winColor = currentLevelObject.winColor;
@@ -148,6 +148,53 @@ public class GameManager : MonoBehaviour
     }
 
     #region GAME_FUNCTIONS
+
+    private void GameWin()
+    {
+        int currentStage = PlayerPrefs.GetInt(DATA.CURRENT_STAGE);
+        string currentStageName = DATA.CURRENT_STAGE + "_" + currentStage;
+        int currentLevel = PlayerPrefs.GetInt(DATA.CURRENT_LEVEL);
+
+        // SET THE LEVEL TO WON
+        PlayerPrefs.SetInt(currentLevelName, 2);
+        
+        // UNLOCK THE NEXT LEVEL
+        int updateLevel = currentLevel + 5;
+        if (updateLevel <= 20)
+        {
+            PlayerPrefs.SetInt(currentStageName + "_" + updateLevel, 1);
+        }
+        else
+        {
+            int updateStage = currentStage + 1;
+            PlayerPrefs.SetInt(DATA.CURRENT_STAGE + "_" + updateStage, 1);
+        }
+        
+        // SET THE CURRENT LEVEL
+        int playLevel = currentLevel + 1;
+        if (playLevel > 20)
+        {
+            currentStage++;
+            playLevel = 1;
+        }
+        
+        PlayerPrefs.SetInt(DATA.CURRENT_STAGE, currentStage);
+        PlayerPrefs.SetInt(DATA.CURRENT_LEVEL, playLevel);
+
+        SceneManager.LoadScene(1);
+    }
+
+    private void GameLose()
+    {
+        SceneManager.LoadScene(1);
+    }
+
+    private void ShowWin()
+    {
+        winImage.gameObject.SetActive(true);
+        winImage.color = colors[winColor];
+        AudioManager.instance.PlaySound(winClip);
+    }
 
     public void GameRestart()
     {
@@ -213,7 +260,8 @@ public class GameManager : MonoBehaviour
 
             stateDelay = VALUES.ANIMATION_TIME;
             StartCoroutine(SwitchStateAfterDelay());
-            
+
+            CheckResult();
             return;
         }
         
@@ -268,6 +316,34 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        CheckResult();
+
+    }
+
+    private void CheckResult()
+    {
+        int lose = 0;
+        bool win = true;
+
+        foreach (var item in cellDictionary)
+        {
+            lose += item.Value.cellData.moves;
+            win = win && (item.Value.cellData.color == -1 || item.Value.cellData.color == winColor);
+            
+        }
+
+        if (win)
+        {
+            Invoke(nameof(ShowWin), stateDelay + 0.5f);
+            Invoke(nameof(GameWin), stateDelay + 1.5f);
+            return;
+        }
+        else if(lose == 0)
+        {
+            AudioManager.instance.PlaySound(loseClip);
+            Invoke(nameof(GameLose), stateDelay + 1f);
+            return;
+        }
     }
     #endregion
 

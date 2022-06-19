@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1b3d93b8f343a74981d7f4f4a51b0f3, type: 3}
-  m_Name: STAGE_1_5
+  m_Name: STAGE_1_15
   m_EditorClassIdentifier: 
-  levelName: CURRENT_STAGE_1_5
+  levelName: CURRENT_STAGE_1_15
   row: 3
   col: 3
   winColor: 3
