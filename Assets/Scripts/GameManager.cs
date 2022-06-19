@@ -31,6 +31,18 @@ public class GameManager : MonoBehaviour
     private Vector2Int startClickGrid, endClickGrid;
     private float stateDelay;
 
+    private List<Cell> neighbours = new List<Cell>();
+    private List<Cell> newNeighbours = new List<Cell>();
+    private Dictionary<Vector2Int, bool> visited = new Dictionary<Vector2Int, bool>();
+
+    private readonly List<Vector2Int> directions = new List<Vector2Int>()
+    {
+        new Vector2Int(1, 0),
+        new Vector2Int(-1, 0),
+        new Vector2Int(0, 1),
+        new Vector2Int(0, -1),
+    };
+
     #endregion
 
     #region GAMEOBJECT_METHODS
@@ -203,6 +215,57 @@ public class GameManager : MonoBehaviour
             StartCoroutine(SwitchStateAfterDelay());
             
             return;
+        }
+        
+        // UPDATE THE FIRST COLLIED CELL
+        int updateColor = endClickedCell.cellData.color;
+        endClickedCell.cellData.color = currentClickedCell.cellData.color;
+
+        StartCoroutine(endClickedCell.ChangeColor(0f));
+        currentClickedCell.cellData.moves--;
+
+        stateDelay = VALUES.ANIMATION_TIME;
+        StartCoroutine(currentClickedCell.UpdateMoves());
+        StartCoroutine(SwitchStateAfterDelay());
+        
+        // Check for neighbours cells
+        newNeighbours.Clear();
+        neighbours.Clear();
+        visited.Clear();
+        neighbours.Add(endClickedCell);
+
+        while (neighbours.Count>0)
+        {
+            newNeighbours.Clear();
+            for (int i = 0; i < neighbours.Count; i++)
+            {
+                for (int j = 0; j < directions.Count; j++)
+                {
+                    if (IsValidPos(neighbours[i].CurrentPos + directions[j]))
+                    {
+                        endClickedCell = cellDictionary[neighbours[i].CurrentPos + directions[j]];
+                        if (!visited.ContainsKey(endClickedCell.CurrentPos))
+                        {
+                            if (endClickedCell.cellData.color == updateColor)
+                            {
+                                endClickedCell.cellData.color = currentClickedCell.cellData.color;
+                                StartCoroutine(endClickedCell.ChangeColor(stateDelay));
+                                newNeighbours.Add(endClickedCell);
+
+                                visited[endClickedCell.CurrentPos] = true;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Invoke(nameof(PlayUpdateSound), stateDelay);
+            stateDelay += (newNeighbours.Count > 0 ? VALUES.ANIMATION_TIME : 0);
+            neighbours.Clear();
+            foreach (var item in newNeighbours)
+            {
+                neighbours.Add(item);
+            }
         }
 
     }

@@ -65,6 +65,23 @@ public class Cell : MonoBehaviour
             yield return null;
         }
     }
+
+    public IEnumerator ChangeColor(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        backSquare.gameObject.SetActive(true);
+        backSquare.StartColorSettings(cellData.color, true);
+        frontSquare.StartColorSettings(cellData.color, false);
+
+        var temp = frontSquare;
+        frontSquare = backSquare;
+        backSquare = temp;
+
+        yield return frontSquare.StartAnimation();
+        
+        backSquare.gameObject.SetActive(false);
+    }
 }
 
 [System.Serializable]

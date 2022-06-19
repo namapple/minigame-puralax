@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using Constants;
 using UnityEngine;
 
@@ -22,6 +20,13 @@ public class Square : MonoBehaviour
         sr.color = color;
         sr.sortingOrder = VALUES.FRONT;
         StartCoroutine(StartAnimation());
+    }
+
+    public void StartColorSettings(int colorValue, bool front)
+    {
+        Color color = front ? GameManager.instance.colors[colorValue] : sr.color;
+        sr.color = color;
+        sr.sortingOrder = front ? VALUES.FRONT : VALUES.BACK;
     }
 
     public IEnumerator StartAnimation()
